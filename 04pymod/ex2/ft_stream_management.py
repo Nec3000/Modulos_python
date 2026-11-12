@@ -1,11 +1,14 @@
 import sys
 import typing
+
 def get_f(fname : str, mode : str) -> typing.IO[str]:
 	try:
 		return open(fname, mode)
 	except Exception as e:
 		sys.stderr.write(f"[STDERR] Error opening file {fname} : {e}")
 		return None
+
+
 def dump_text(text : str) -> None:
 	print("---\n")
 	print(text)

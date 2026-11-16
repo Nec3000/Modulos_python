@@ -15,7 +15,7 @@ def gen_inventory() -> dict[str, int]:
 			new = parse(arg, inventory)
 			inventory.update([new])
 		except ValueError as e:
-			print(f"Quantity error for {arg.split(":")[0]}: {e}")
+			print(f"Quantity error for {arg.split(':')[0]}: {e}")
 		except Exception as e:
 			print(f"{e}")
 	return inventory

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import site
@@ -11,18 +13,23 @@ if __name__ == "__main__":
     is_env = in_enviroment()
     if is_env:
         msg = "The laboratory is sealed"
+        curr = sys.executable
     else:
         msg = "You are working in the open"
+        curr = os.path.realpath(sys.executable)
     print(f"\nLABORATORY STATUS: {msg}\n")
-    print(f"Current Python: {sys.executable}")
+    print(f"Current Python: {curr}")
     print("Virtual Environment:", end=" ")
     if is_env:
         print(os.path.basename(sys.prefix))
-        print("")
+        print(f"Environment Path: {sys.prefix}\n")
         print("SUCCESS: You are working in an isolated environment!")
         print("Safe to install reagents without affecting")
         print("the global system\n")
-        print(f"Reagent installation path:\n{site.getsitepackages()}")
+        print("Reagent installation path:")
+        print(next(
+            (p for p in site.getsitepackages() if p.endswith("site-packages")),
+            site.getsitepackages()[0]))
     else:
         print("None detected\n")
         print("WARNING: You are in the global environment!")

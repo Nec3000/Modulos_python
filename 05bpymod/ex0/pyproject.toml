@@ -1,0 +1,11 @@
+[project]
+name = "lab-env"
+version = 0.1.0
+requires-python = ">=3.10"
+dependencies = [
+    "pandas (==2.1.0)",
+    "numpy (==1.25.0)",
+]
+
+[tool.poetry]
+package-mode = false

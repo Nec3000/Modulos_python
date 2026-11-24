@@ -3,7 +3,7 @@ import sys
 
 
 try:
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # type: ignore[import-not-found]
 except ImportError:
     print("ERROR: 'python-dotenv' not installed.")
     print("To set up an environment:")

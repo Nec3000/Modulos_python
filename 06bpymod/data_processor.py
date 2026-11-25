@@ -33,7 +33,8 @@ class NumericProcessor(DataProcessor):
             return all(isinstance(elem, int) for elem in data)
         return False
 
-    def ingest(self, data: int | float | list[int | float]):
+    def ingest(self, data: int | float |
+               list[int] | list[float] | list[int | float]):
         if not self.validate(data):
             raise ValueError("Improper numeric data")
         if isinstance(data, list):
@@ -95,7 +96,21 @@ class LogProcessor(DataProcessor):
 
 
 def main() -> None:
-    pass
+    print("=== Code Nexus - Data Processor ===\n")
+    print("Testing Numeric Processor...")
+    num_pr = NumericProcessor()
+    print(f" Trying to validate input '42': {num_pr.validate(42)}")
+    print(f" Trying to validate input 'Hello': {num_pr.validate('Hello')}")
+    print("Test invalid ingestion of string 'foo' without prior validation:")
+    try:
+        num_pr.ingest('foo')
+    except ValueError as e:
+        print(e)
+    data = [1, 2, 3, 4, 5]
+    num_pr.ingest(data)
+    print("Extracting 3 values...")
+    
+
 
 
 if __name__ == "__main__":

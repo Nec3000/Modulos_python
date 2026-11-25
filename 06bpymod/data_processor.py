@@ -49,16 +49,20 @@ class TextProcessor(DataProcessor):
         super().__init__()
 
     def validate(self, data: Any) -> bool:
-        if isinstance(data, (int, float)):
+        if isinstance(data, (int, str)):
             return True
         if isinstance(data, list):
-            return all(isinstance(elem, (int, float)) for elem in data)
+            return all(isinstance(elem, str) for elem in data)
         return False
 
     def ingest(self, data: str | list[str]):
         if not self.validate(data):
             raise ValueError("Improper text data")
-        self._stored.append(data)
+        if isinstance(data, list):
+            for msg in data:
+                self._stored.append(msg)
+        else:
+            self._stored.append(data)
 
 
 class LogProcessor(DataProcessor):
@@ -67,13 +71,11 @@ class LogProcessor(DataProcessor):
 
     def val_log(self, data: Any) -> bool:
         return (isinstance(data, dict)
-                and all(
-                isinstance(k, str) and isinstance(v, str)
-                for k, v in data.items()
-                )
                 and len(data) == 2
                 and "log_level" in data
-                and "log_message" in data)
+                and "log_message" in data
+                and isinstance(data["log_level"], str)
+                and isinstance(data["log_message"], str))
 
     def validate(self, data: Any) -> bool:
         return (self.val_log(data) or
@@ -81,9 +83,8 @@ class LogProcessor(DataProcessor):
                  and all(self.val_log(d) for d in data)))
 
     def append_log(self, log: dict[str, str]):
-        for k, v in log.items():
-            self._stored.append(k)
-            self._stored.append(v)
+        msg = f"{log['log_level']}: {log['log_message']}"
+        self._stored.append(msg)
 
     def ingest(self, data: dict[str, str] | list[dict[str, str]]):
         if not self.validate(data):
@@ -93,6 +94,16 @@ class LogProcessor(DataProcessor):
                 self.append_log(elem)
         else:
             self.append_log(data)
+
+
+def extract(n: int, pr: DataProcessor, type: str):
+    print(f" Extracting {n} value", end="")
+    if n == 1:
+        print("s", end="")
+    print("...")
+    for i in range(n):
+        indx, num = pr.output()
+        print(f" {type} value {indx} : {num}")
 
 
 def main() -> None:
@@ -109,8 +120,24 @@ def main() -> None:
     data = [1, 2, 3, 4, 5]
     num_pr.ingest(data)
     print("Extracting 3 values...")
-    
-
+    extract(3, num_pr, "Numeric")
+    print()
+    print("Testing Text Processor...")
+    text_pr = TextProcessor()
+    print(f" Trying to validate input '42': {text_pr.validate(42)}")
+    data2 = ['Hello', 'Nexus', 'World']
+    print(f" Processing data: {data2}")
+    text_pr.ingest(data2)
+    extract(1, text_pr, "Text")
+    print()
+    print("Testing Log Processor...")
+    log_pr = LogProcessor()
+    print(f" Trying to validate input 'Hello': {log_pr.validate('Hello')}")
+    data3 = [{'log_level': 'NOTICE', 'log_message': 'Connection to server'},
+             {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
+    print(f" Processing data: {data3}")
+    log_pr.ingest(data3)
+    extract(2, log_pr, "Log")
 
 
 if __name__ == "__main__":

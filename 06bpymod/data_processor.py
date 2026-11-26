@@ -114,7 +114,7 @@ def main() -> None:
     print(f" Trying to validate input 'Hello': {num_pr.validate('Hello')}")
     print("Test invalid ingestion of string 'foo' without prior validation:")
     try:
-        num_pr.ingest('foo')
+        num_pr.ingest('foo')  # type: ignore[arg-type]
     except ValueError as e:
         print(e)
     data = [1, 2, 3, 4, 5]

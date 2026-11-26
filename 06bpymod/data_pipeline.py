@@ -153,11 +153,31 @@ class DataStream:
 
     def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
         for proc in self._processors:
-            print("CSV Output")
+            if isinstance(plugin, CSVPlugin):
+                print("CSV Output")
+            else:
+                print("JSON Output")
             data = []
             for i in range(nb):
                 data.append(proc.output())
             plugin.process_output(data)
+
+
+class JSONPlugin:
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        if len(data) == 0:
+            return
+        first = True
+        for elem in data:
+            if elem[0] == -1:
+                break
+            if not first:
+                print(", ", end="")
+            else:
+                print("{", end="")
+                first = False
+            print(f'"item_{elem[0]}": "{elem[1]}"', end="")
+        print("}")
 
 
 class CSVPlugin:
@@ -176,16 +196,46 @@ class CSVPlugin:
             self.process_output(data)
 
 
+def use_plugin(nb: int, type: str, plugin: ExportPlugin, stream: DataStream):
+    print(f"\nSend {3} processed data from each processor to a {type} plugin:")
+    stream.output_pipeline(nb, plugin)
+    print()
+
+
 def main() -> None:
-    stream = DataStream()
+    json = JSONPlugin()
+    csv = CSVPlugin()
     num_pr = NumericProcessor()
     text_pr = TextProcessor()
+    log_pr = LogProcessor()
+    print("=== Code Nexus - Data Pipeline ===")
+    print("\nInitialize Data Stream...\n")
+    stream = DataStream()
+    stream.print_processors_stats()
+    print("\nRegistering Processors\n")
     stream.register_processor(num_pr)
     stream.register_processor(text_pr)
-    stream.process_stream([3.14, "hola", "adios", "lala"])
+    stream.register_processor(log_pr)
+    batch = ['Hello world', [3.14, -1, 2.71],
+             [{'log_level': 'WARNING', 'log_message':
+               'Telnet access! Use ssh instead'},
+              {'log_level': 'INFO', 'log_message': 'User wil isconnected'}],
+             42, ['Hi', 'five']]
+    print(f"Send first batch of data on stream: {batch}")
+    stream.process_stream(batch)
     stream.print_processors_stats()
-    csv = CSVPlugin()
-    stream.output_pipeline(3, csv)
+    use_plugin(3, "CSV", csv, stream)
+    stream.print_processors_stats()
+    batch2 = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
+              [{'log_level': 'ERROR', 'log_message': '500 server crash'},
+               {'log_level': 'NOTICE', 'log_message':
+                'Certificate expires in 10 days'}],
+              [32, 42, 64, 84, 128, 168], 'World hello']
+    print(f"Send another batch of data: {batch2}")
+    stream.process_stream(batch2)
+    stream.print_processors_stats()
+    use_plugin(5, "JSON", json, stream)
+    stream.print_processors_stats()
 
 
 if __name__ == "__main__":

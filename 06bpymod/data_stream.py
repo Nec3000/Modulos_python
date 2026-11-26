@@ -37,7 +37,7 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, (int, float)):
             return True
         if isinstance(data, list):
-            return all(isinstance(elem, int) for elem in data)
+            return all(isinstance(elem, (int, float)) for elem in data)
         return False
 
     def ingest(self, data: int | float |
@@ -149,17 +149,39 @@ class DataStream:
 
 
 def main() -> None:
-    stream = DataStream()
     num_pr = NumericProcessor()
     text_pr = TextProcessor()
     log_pr = LogProcessor()
-    stream.register_processor(num_pr)
-    stream.process_stream([1, 2, 4, 5])
-    num_pr.output()
+    print("=== Code Nexus - Data Stream ===\n")
+    print("Initialize Data Stream...")
+    stream = DataStream()
     stream.print_processors_stats()
-
+    print()
+    print("Registering Numeric Processor\n")
+    stream.register_processor(num_pr)
+    batch = ['Hello world', [3.14, -1, 2.71],
+             [{'log_level': 'WARNING', 'log_message':
+               'Telnet access! Use ssh instead'},
+              {'log_level': 'INFO', 'log_message': 'User wil isconnected'}],
+             42, ['Hi', 'five']]
+    print(f"Send first batch of data on stream: {batch}")
+    stream.process_stream(batch)
+    stream.print_processors_stats()
+    print("\nRegistering other data processors")
     stream.register_processor(text_pr)
     stream.register_processor(log_pr)
+    print("Send the same batch again")
+    stream.process_stream(batch)
+    stream.print_processors_stats()
+    print("\nConsume some elements from "
+          "the data processors: Numeric 3, Text 2, Log 1")
+    num_pr.output()
+    num_pr.output()
+    num_pr.output()
+    text_pr.output()
+    text_pr.output()
+    log_pr.output()
+    stream.print_processors_stats()
 
 
 if __name__ == "__main__":

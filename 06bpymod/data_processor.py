@@ -30,7 +30,7 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, (int, float)):
             return True
         if isinstance(data, list):
-            return all(isinstance(elem, int) for elem in data)
+            return all(isinstance(elem, (int, float)) for elem in data)
         return False
 
     def ingest(self, data: int | float |

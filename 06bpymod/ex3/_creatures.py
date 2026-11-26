@@ -14,25 +14,25 @@ class Creature(ABC):
 
 
 class Flameling(Creature):
-    def __init__(self):
+    def __init__(self) -> None:
         self._name = "Flameling"
         self._type = "Fire"
 
-    def attack(self):
+    def attack(self) -> str:
         return f"{self._name} uses Ember!"
 
 
 class Pyrodon(Creature):
-    def __init__(self):
+    def __init__(self) -> None:
         self._name = "Pyrodon"
         self._type = "Fire/Flying"
 
-    def attack(self):
+    def attack(self) -> str:
         return f"{self._name} uses Flamethrower!"
 
 
 class TransformCapability(ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self._transformed = False
 
     @abstractmethod
@@ -45,23 +45,23 @@ class TransformCapability(ABC):
 
 
 class Shiftling(Creature, TransformCapability):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._name = "Shiftling"
         self._type = "Normal"
 
-    def attack(self):
+    def attack(self) -> str:
         if not self._transformed:
             return f"{self._name} attacks normally"
         return f"{self._name} performs a boosted strike!"
 
-    def transform(self):
+    def transform(self) -> str:
         if not self._transformed:
             self._transformed = True
             return f"{self._name} shifts into a sharper form!"
         return "Alredy transformed"
 
-    def revert(self):
+    def revert(self) -> str:
         if self._transformed:
             self._transformed = False
             return f"{self._name} returns to normal."
@@ -69,23 +69,23 @@ class Shiftling(Creature, TransformCapability):
 
 
 class Morphagon(Creature, TransformCapability):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._name = "Morphagon"
         self._type = "Normal/Dragon"
 
-    def attack(self):
+    def attack(self) -> str:
         if not self._transformed:
             return f"{self._name} attacks normally"
         return f"{self._name} unleashes a devastating morph strike!"
 
-    def transform(self):
+    def transform(self) -> str:
         if not self._transformed:
             self._transformed = True
             return f"{self._name} morphs into a dragonic battle form!"
         return "Alredy transformed"
 
-    def revert(self):
+    def revert(self) -> str:
         if self._transformed:
             self._transformed = False
             return f"{self._name} stabilizes its form."
@@ -103,16 +103,16 @@ class CreatureFactory(ABC):
 
 
 class FlameFactory(CreatureFactory):
-    def create_base(self):
+    def create_base(self) -> Creature:
         return Flameling()
 
-    def create_evolved(self):
+    def create_evolved(self) -> Creature:
         return Pyrodon()
 
 
 class TransformCreatureFactory(CreatureFactory):
-    def create_base(self):
+    def create_base(self) -> Shiftling:
         return Shiftling()
 
-    def create_evolved(self):
+    def create_evolved(self) -> Morphagon:
         return Morphagon()

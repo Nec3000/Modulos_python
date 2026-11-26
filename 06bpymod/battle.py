@@ -12,7 +12,7 @@ def test_fact(f: e.CreatureFactory) -> None:
     print()
 
 
-def test_battle(f1: e.CreatureFactory, f2: e.CreatureFactory):
+def test_battle(f1: e.CreatureFactory, f2: e.CreatureFactory) -> None:
     print("Testing battle")
     b1 = f1.create_base()
     b2 = f2.create_base()

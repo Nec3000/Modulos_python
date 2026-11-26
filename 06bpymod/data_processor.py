@@ -34,7 +34,7 @@ class NumericProcessor(DataProcessor):
         return False
 
     def ingest(self, data: int | float |
-               list[int] | list[float] | list[int | float]):
+               list[int] | list[float] | list[int | float]) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
         if isinstance(data, list):
@@ -49,13 +49,13 @@ class TextProcessor(DataProcessor):
         super().__init__()
 
     def validate(self, data: Any) -> bool:
-        if isinstance(data, (int, str)):
+        if isinstance(data, str):
             return True
         if isinstance(data, list):
             return all(isinstance(elem, str) for elem in data)
         return False
 
-    def ingest(self, data: str | list[str]):
+    def ingest(self, data: str | list[str]) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
         if isinstance(data, list):
@@ -82,11 +82,11 @@ class LogProcessor(DataProcessor):
                 (isinstance(data, list)
                  and all(self.val_log(d) for d in data)))
 
-    def append_log(self, log: dict[str, str]):
+    def append_log(self, log: dict[str, str]) -> None:
         msg = f"{log['log_level']}: {log['log_message']}"
         self._stored.append(msg)
 
-    def ingest(self, data: dict[str, str] | list[dict[str, str]]):
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
         if isinstance(data, list):
@@ -96,14 +96,14 @@ class LogProcessor(DataProcessor):
             self.append_log(data)
 
 
-def extract(n: int, pr: DataProcessor, type: str):
+def extract(n: int, pr: DataProcessor, type: str) -> None:
     print(f" Extracting {n} value", end="")
-    if n == 1:
+    if n != 1:
         print("s", end="")
     print("...")
     for i in range(n):
         indx, num = pr.output()
-        print(f" {type} value {indx} : {num}")
+        print(f" {type} value {indx}: {num}")
 
 
 def main() -> None:
@@ -112,14 +112,14 @@ def main() -> None:
     num_pr = NumericProcessor()
     print(f" Trying to validate input '42': {num_pr.validate(42)}")
     print(f" Trying to validate input 'Hello': {num_pr.validate('Hello')}")
-    print("Test invalid ingestion of string 'foo' without prior validation:")
+    print(" Test invalid ingestion of string 'foo' without prior validation:")
     try:
         num_pr.ingest('foo')  # type: ignore[arg-type]
     except ValueError as e:
-        print(e)
+        print(f" Got exception: {e}")
     data = [1, 2, 3, 4, 5]
+    print(f" Processing data: {data}")
     num_pr.ingest(data)
-    print("Extracting 3 values...")
     extract(3, num_pr, "Numeric")
     print()
     print("Testing Text Processor...")

@@ -2,11 +2,7 @@ import ex4 as e4
 import ex3 as e3
 
 
-fact = e3.CreatureFactory
-strategy = e4.BattleStrategy
-
-
-def battle(opps: list[tuple[fact, strategy]]) -> None:
+def battle(opps: list[tuple[e3.CreatureFactory, e4.BattleStrategy]]) -> None:
     print("*** Tournament ***")
     print(f"{len(opps)} opponents involved\n")
     for i in range(len(opps)):
@@ -19,7 +15,7 @@ def battle(opps: list[tuple[fact, strategy]]) -> None:
             print(op1.describe())
             print(" vs.")
             print(op2.describe())
-            print(" now fight")
+            print(" now fight!")
             try:
                 print(s1.act(op1))
                 print(s2.act(op2))
@@ -39,7 +35,7 @@ def main() -> None:
     battle([(fire, normal), (transf, agressive)])
     print("Tournament 1 (error)")
     print("[ (Shiftling+Aggressive), (Flameling+Aggressive) ]")
-    battle([(fire, agressive), (transf, agressive)])
+    battle([(transf, agressive), (fire, agressive)])
 
 
 if __name__ == "__main__":

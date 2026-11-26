@@ -3,6 +3,8 @@ from typing import Any
 
 
 class DataProcessor(ABC):
+    _name: str
+
     def __init__(self) -> None:
         self._extracted: int = 0
         self._stored: list[Any] = []
@@ -32,6 +34,7 @@ class DataProcessor(ABC):
 class NumericProcessor(DataProcessor):
     def __init__(self) -> None:
         super().__init__()
+        self._name: str = "Numeric"
 
     def validate(self, data: Any) -> bool:
         if isinstance(data, (int, float)):
@@ -41,7 +44,7 @@ class NumericProcessor(DataProcessor):
         return False
 
     def ingest(self, data: int | float |
-               list[int] | list[float] | list[int | float]):
+               list[int] | list[float] | list[int | float]) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
         if isinstance(data, list):
@@ -56,15 +59,16 @@ class NumericProcessor(DataProcessor):
 class TextProcessor(DataProcessor):
     def __init__(self) -> None:
         super().__init__()
+        self._name: str = "Text"
 
     def validate(self, data: Any) -> bool:
-        if isinstance(data, (int, str)):
+        if isinstance(data, str):
             return True
         if isinstance(data, list):
             return all(isinstance(elem, str) for elem in data)
         return False
 
-    def ingest(self, data: str | list[str]):
+    def ingest(self, data: str | list[str]) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
         if isinstance(data, list):
@@ -79,6 +83,7 @@ class TextProcessor(DataProcessor):
 class LogProcessor(DataProcessor):
     def __init__(self) -> None:
         super().__init__()
+        self._name: str = "Log"
 
     def val_log(self, data: Any) -> bool:
         return (isinstance(data, dict)
@@ -93,12 +98,12 @@ class LogProcessor(DataProcessor):
                 (isinstance(data, list)
                  and all(self.val_log(d) for d in data)))
 
-    def append_log(self, log: dict[str, str]):
+    def append_log(self, log: dict[str, str]) -> None:
         msg = f"{log['log_level']}: {log['log_message']}"
         self._stored.append(msg)
         self._processed += 1
 
-    def ingest(self, data: dict[str, str] | list[dict[str, str]]):
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
         if isinstance(data, list):
@@ -108,14 +113,8 @@ class LogProcessor(DataProcessor):
             self.append_log(data)
 
 
-def _get_info(proc: DataProcessor) -> tuple[str, int, int]:
-    if isinstance(proc, NumericProcessor):
-        type = "Numeric"
-    elif isinstance(proc, TextProcessor):
-        type = "Text"
-    else:
-        type = "Log"
-    return (type, proc.get_processed(), proc.get_remaining())
+def _get_info(proc: DataProcessor) -> tuple[int, int]:
+    return (proc.get_processed(), proc.get_remaining())
 
 
 class DataStream:
@@ -144,8 +143,8 @@ class DataStream:
             return
         for proc in self._processors:
             info = _get_info(proc)
-            print(f"{info[0]} Processor: total {info[1]} items processed,"
-                  f" remaining {info[2]} on processor")
+            print(f"{proc._name} Processor: total {info[0]} items processed,"
+                  f" remaining {info[1]} on processor")
 
 
 def main() -> None:

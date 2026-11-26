@@ -21,9 +21,12 @@ class NormalStrategy(BattleStrategy):
 
 
 class AggressiveStrategy(BattleStrategy):
+    class CreatureException(Exception):
+        pass
+
     def act(self, c: Creature) -> str:
         if not isinstance(c, TransformCapability):
-            raise Exception(
+            raise self.CreatureException(
                 f"Invalid Creature '{c._name}' for this aggressive strategy")
         return f"{c.transform()}\n{c.attack()}\n{c.revert()}"
 

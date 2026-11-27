@@ -24,9 +24,9 @@ def main() -> None:
     print("Valid station created:")
     print(f"ID: {ss.station_id}")
     print(f"Name: {ss.name}")
-    print(f"Crew: {ss.crew_size}")
-    print(f"Power: {ss.power_level}")
-    print(f"Oxygen: {ss.oxygen_level}")
+    print(f"Crew: {ss.crew_size} people")
+    print(f"Power: {ss.power_level}%")
+    print(f"Oxygen: {ss.oxygen_level}%")
     if ss.is_operational:
         print("Status: Operational")
     else:

@@ -1,0 +1,20 @@
+def artifact_sorter(artifacts: list[dict]) -> list[dict]:
+    return sorted(artifacts, key=lambda x: x["power"], reverse=True)
+
+
+def power_filter(mages: list[dict], min_power: int) -> list[dict]:
+    return list(filter(lambda x: x["power"] >= min_power, mages))
+
+
+def spell_transformer(spells: list[str]) -> list[str]:
+    return list(map(lambda s: f"* {s} *", spells))
+
+
+def mage_stats(mages: list[dict]) -> dict:
+    
+
+
+print(power_filter([{"name": "1", "power": 25, "type": "a"},
+                    {"name": "1", "power": 30, "type": "a"},
+                    {"name": "1", "power": 45, "type": "a"}], 32))
+print(spell_transformer(["fireball", "Wish"]))
